@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-filename = "punch.csv"
+filename = "flex.csv"
 
 df = pd.read_csv("../data/" + filename)
 
@@ -18,7 +18,6 @@ plt.title("Acceleration")
 plt.xlabel("Sample #")
 plt.ylabel("Acceleration (G)")
 plt.legend()
-#plt.show()
 
 plt.figure()
 plt.plot(index, df['gX'], 'g.', label='x', linestyle='solid', marker=',')
@@ -28,4 +27,25 @@ plt.title("Gyroscope")
 plt.xlabel("Sample #")
 plt.ylabel("Gyroscope (deg/sec)")
 plt.legend()
+
+
+
+
+import statsmodels.api as sm
+y = np.asarray(df['aX'])
+
+dec = sm.tsa.seasonal_decompose(y, freq=10)
+fig = dec.plot()
+
+
+
+from scipy import signal
+
+f, t, Sxx = signal.spectrogram(y, fs=1, nperseg = 50, noverlap=30)
+
+plt.figure()
+plt.pcolormesh(t, f, Sxx)
+#powerSpectrum, freqenciesFound, time, imageAxis = plt.specgram(y, Fs=0.1)
+plt.ylabel('Frequency [Hz]')
+plt.xlabel('Time [sec]')
 plt.show()
