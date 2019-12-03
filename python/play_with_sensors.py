@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 # signal processing
-import statsmodels.api as sm
+#import statsmodels.api as sm
 from scipy.fftpack import fft
 from scipy.signal import welch
 from scipy import signal
@@ -44,55 +44,58 @@ df = pd.read_csv("../data/" + filename)
 
 ## == Signal to investigate
 
-labs = ["aX", "aY","aZ"]
-colors = ["r","g", "b"]
+labs = [["aX", "aY","aZ"], ["gX", "gY","gZ"]]
+names = [["Accel", "Accel", "Accel"], ["Gyro","Gyro","Gyro"]]
+colors = [["r","g", "b"], ["r","g", "b"]]
 
-plt.figure()
-for i, lb in enumerate(labs):
-    lb = labs[i]
-    y = np.asarray(df[lb])
-    sy = Signal_arduino(y,T=20, label=lb)
+lab = labs[3:]
 
-    plt.plot(sy.t, sy.y,  linestyle='-', color=colors[i], label=lb)
-    plt.title("Acceleration ")
-    plt.xlabel("Time")
-plt.legend()
+for j, lab in enumerate(labs):
 
-plt.figure()
-for i, lb in enumerate(labs):
-    lb = labs[i]
-    y = np.asarray(df[lb])
-    sy = Signal_arduino(y,T=20, label=lb)
-    
-    plt.plot(*sy.fft(), linestyle='-', color=colors[i], label=lb)
-    plt.xlabel('Frequency [Hz]')
-    plt.ylabel('Amplitude')
-    plt.title("FFT Accel")
-plt.legend()
+    plt.figure()
+    for i, lb in enumerate(lab):
+        y = np.asarray(df[lb])
+        sy = Signal_arduino(y,T=20, label=lb)
 
+        plt.plot(sy.t, sy.y,  linestyle='-', color=colors[j][i], label=lb)
+        plt.title(names[j][i])
+        plt.xlabel("Time")
+    plt.legend()
 
-plt.figure()
-for i, lb in enumerate(labs):
-    lb = labs[i]
-    y = np.asarray(df[lb])
-    sy = Signal_arduino(y,T=20, label=lb)
-    plt.plot(*sy.psd(), linestyle='-', color=colors[i], label=lb)
-    plt.xlabel('Frequency [Hz]')
-    plt.ylabel('PSD [V**2 / Hz]')
-    plt.title('PSD Accel')
-plt.legend()
+    plt.figure()
+    for i, lb in enumerate(lab):
+        y = np.asarray(df[lb])
+        sy = Signal_arduino(y,T=20, label=lb)
+        
+        plt.plot(*sy.fft(), linestyle='-', color=colors[j][i], label=lb)
+        plt.xlabel('Frequency [Hz]')
+        plt.ylabel('Amplitude')
+        plt.title("FFT "+names[j][i])
+    plt.legend()
 
 
-plt.figure()
-for i, lb in enumerate(labs):
-    lb = labs[i]
-    y = np.asarray(df[lb])
-    sy = Signal_arduino(y,T=20, label=lb)
-    plt.plot(*sy.autocorr(), linestyle='-', color=colors[i], label=lb)
-    plt.xlabel('time delay [s]')
-    plt.ylabel('Autocorrelation amplitude')
-    plt.title('Autocorr Accel')
-plt.legend()
+    plt.figure()
+    for i, lb in enumerate(lab):
+        y = np.asarray(df[lb])
+        sy = Signal_arduino(y,T=20, label=lb)
+        
+        plt.plot(*sy.psd(), linestyle='-', color=colors[j][i], label=lb)
+        plt.xlabel('Frequency [Hz]')
+        plt.ylabel('PSD [V**2 / Hz]')
+        plt.title('PSD '+ names[j][i])
+    plt.legend()
+
+
+    plt.figure()
+    for i, lb in enumerate(lab):
+        y = np.asarray(df[lb])
+        sy = Signal_arduino(y,T=20, label=lb)
+        
+        plt.plot(*sy.autocorr(), linestyle='-', color=colors[j][i], label=lb)
+        plt.xlabel('time delay [s]')
+        plt.ylabel('Autocorrelation amplitude')
+        plt.title('Autocorr '+ names[j][i])
+    plt.legend()
 
 
 
