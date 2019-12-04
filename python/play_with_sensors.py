@@ -48,7 +48,6 @@ labs = [["aX", "aY","aZ"], ["gX", "gY","gZ"]]
 names = [["Accel", "Accel", "Accel"], ["Gyro","Gyro","Gyro"]]
 colors = [["r","g", "b"], ["r","g", "b"]]
 
-lab = labs[3:]
 
 for j, lab in enumerate(labs):
 
