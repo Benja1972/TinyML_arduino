@@ -2,78 +2,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-# signal processing
-#import statsmodels.api as sm
-from scipy.fftpack import fft
-from scipy.signal import welch
-from scipy import signal
-from detect_peaks import detect_peaks
-
-class Signal_arduino:
-    def __init__(self, y, dt=1, label=""):
-        self.y = y
-        self.dt = dt
-        self.N = len(y)
-        self.T = self.N*self.dt
-        self.fs = 1/self.dt
-        self.t = self.dt*np.arange(0, self.N)
-        self.label=label
-
-    def fft(self):
-        # fft transform
-        f = np.linspace(0.0, 1.0/(2.0*self.dt), self.N//2)
-        fft_vals_ = fft(self.y)
-        fft_vals = 2.0/self.N * np.abs(fft_vals_[0:self.N//2])
-        return f, fft_vals
-
-    def psd(self):
-        f, psd_vals = welch(self.y, fs=self.fs)
-        return f, psd_vals
-
-    def autocorr(self):
-        res = np.correlate(self.y, self.y, mode='full')
-        autocorr_vals = res[len(res)//2:]
-        return self.t, autocorr_vals
-
-
-
-
-class Sample_arduino:
-    def __init__(self, df, start, end, labels=[], dt=1):
-        self.data={}
-        for lb in labels:
-            self.data[lb]=Signal_arduino(df.iloc[start:end][lb], dt=dt, label=lb)
-        
-
-# wavelet -- TODO!!!
-
-
-def get_peaks(x,y,mph=None, n=5):
-    if not mph:
-        mph = 0.2*np.nanmax(y)
-    ind = detect_peaks(y, mph=mph)
-    xp, yp = list(x[ind]), list(y[ind])
-    if len(xp) >= n:
-        return xp[:n], yp[:n]
-    else:
-        miss = n-len(xp)
-        return xp + [0]*miss, yp + [0]*miss
-
-
-def mph_calc(y,perc=5, dnt=10):
-    y_min = np.nanpercentile(np.abs(y), perc)
-    y_max = np.nanpercentile(np.abs(y), 100-perc)
-    return y_min + (y_max - y_min)/dnt
-
-
-
-
+# import local 
+from signals_processing import *
 
 ## == Load data
 filename = "flex.csv"
 df = pd.read_csv("../data/" + filename)
 dta = 40e-3
 num_samples = 119
+
+labels = {"aX":[-4,4], "aY":[-4,4],"aZ":[-4,4], "gX":[-2000,2000], "gY":[-2000,2000],"gZ":[-2000,2000]}
+
+smpl = Sample_arduino(df,0,num_samples,labels=labels)
 
 idx = 3
 df =  df.iloc[idx*num_samples:(idx+1)*num_samples]
@@ -143,25 +83,6 @@ plt.show()
 
 
 ############################# TEMP #############################
-#plt.rcParams["figure.figsize"] = (20,10)
-
-#~ plt.figure()
-#~ plt.plot(index, df['aX'], 'g.', label='x', linestyle='solid', marker=',')
-#~ plt.plot(index, df['aY'], 'b.', label='y', linestyle='solid', marker=',')
-#~ plt.plot(index, df['aZ'], 'r.', label='z', linestyle='solid', marker=',')
-#~ plt.title("Acceleration")
-#~ plt.xlabel("Sample #")
-#~ plt.ylabel("Acceleration (G)")
-#~ plt.legend()
-
-#~ plt.figure()
-#~ plt.plot(index, df['gX'], 'g.', label='x', linestyle='solid', marker=',')
-#~ plt.plot(index, df['gY'], 'b.', label='y', linestyle='solid', marker=',')
-#~ plt.plot(index, df['gZ'], 'r.', label='z', linestyle='solid', marker=',')
-#~ plt.title("Gyroscope")
-#~ plt.xlabel("Sample #")
-#~ plt.ylabel("Gyroscope (deg/sec)")
-#~ plt.legend()
 
 
 
