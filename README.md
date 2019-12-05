@@ -17,4 +17,6 @@ References
 
 4. [Get started with machine learning on Arduino - ML movement](https://blog.arduino.cc/2019/10/15/get-started-with-machine-learning-on-arduino/)
 
+   - [Tiny ML on Arduino: Gesture recognition tutorial](https://colab.research.google.com/github/arduino/ArduinoTensorFlowLiteTutorials/blob/master/GestureToEmoji/arduino_tinyml_workshop.ipynb)
+
 5. [Fruit identification using Arduino and TensorFlow](https://blog.arduino.cc/2019/11/07/fruit-identification-using-arduino-and-tensorflow/)
