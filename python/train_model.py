@@ -14,17 +14,20 @@ np.random.seed(SEED)
 
 ## == Load data
 
-dta = 40e-3
+# number of samples per movement
 num_samples = 119
 
+# dictonory of movements and corresponding filenames
 gestures = {
     "punch": "../data/punch.csv",
     "flex": "../data/flex.csv",
 }
 
+# number of gestures
 n_gestures = len(gestures)
 
 ## == create a one-hot encoded matrix that is used in the output
+# matrix representation of response: for example for 'punch' we got [1,0]
 one_hot_gestures = np.eye(n_gestures)
 
 
@@ -33,21 +36,41 @@ inputs = []
 outputs = []
 ts = []
 
-labels = {"aX":[-4,4], "aY":[-4,4],"aZ":[-4,4], "gX":[-2000,2000], "gY":[-2000,2000],"gZ":[-2000,2000]}
+# labels of data with ranges of sensors for normalization: label:[min:max]
+labels = {"aX":[-4,4], 
+          "aY":[-4,4],
+          "aZ":[-4,4], 
+          "gX":[-2000,2000], 
+          "gY":[-2000,2000],
+          "gZ":[-2000,2000]}
 
 
+# open files and collect data to inputs and outputs
 for ind, gst in enumerate(gestures):
+    
+    # open file as dataframe
     df = pd.read_csv(gestures[gst])
+    # ouput vector for gesture, ex.: [0,1]
     out = one_hot_gestures[ind]
+    # number of recordings in file
     num_recordings = int(df.shape[0] /num_samples)
     
     for i in range(num_recordings):
+        # take single recording and process it to vector for input using  
+        # Sample_arduino() object from signal_processing.py
         smpl = Sample_arduino(df,i*num_samples,(i+1)*num_samples,labels=labels)
+        
+        # get a 1D vector of data for recording
         tnsr = smpl.get_data_vector()
+        
+        # collect inputs and outputs
         inputs.append(tnsr.squeeze().tolist())
         outputs.append(out)
     
     
+
+# |||| === Below is part of the code from colab with some modifocation |||||||
+# vvvv =============================================================== vvvvvvv
 
 # convert the list to numpy array
 inputs = np.array(inputs)
@@ -91,6 +114,7 @@ loss = history.history['loss']
 val_loss = history.history['val_loss']
 epochs = range(1, len(loss) + 1)
 
+# skip first epoches for plotting for simplicity of graph
 SKIP = 100
 plt.plot(epochs[SKIP:], loss[SKIP:], 'g.', label='Training loss')
 plt.plot(epochs[SKIP:], val_loss[SKIP:], 'b.', label='Validation loss')
@@ -136,9 +160,5 @@ tflite_model = converter.convert()
 # Save the model to disk
 with open("../models/gesture_model.tflite", "wb") as f:
     f.write(tflite_model)
-  
-#~ import os
-#~ basic_model_size = os.path.getsize("gesture_model.tflite")
-#~ print("Model is %d bytes" % basic_model_size)
 
 
