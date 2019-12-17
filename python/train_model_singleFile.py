@@ -15,13 +15,16 @@ np.random.seed(SEED)
 ## == Load data
 
 # number of samples per movement
-num_samples = 119
+num_samples = 64
 
 # dictonory of movements and corresponding filenames
-gestures = {
-    "punch": "../data/punch.csv",
-    "flex": "../data/flex.csv",
-}
+filename = '../data/Poing_flex_then_ext_X50_64samples.csv'
+
+#~ gestures = {
+    #~ "punch": "../data/punch.csv",
+    #~ "flex": "../data/flex.csv",
+#~ }
+gestures = ["poing_flex","ext"]
 
 # number of gestures
 n_gestures = len(gestures)
@@ -46,26 +49,30 @@ labels = {"aX":[-4,4],
 
 
 # open files and collect data to inputs and outputs
-for ind, gst in enumerate(gestures):
+
+# open file as dataframe
+df = pd.read_csv(filename)
+df.dropna(inplace=True)
+
+# number of recordings in file
+num_recordings = int(df.shape[0] /num_samples)
+
+for i in range(num_recordings):
+    # take single recording and process it to vector for input using  
+    # Sample_arduino() object from signal_processing.py
+    smpl = Sample_arduino(df,i*num_samples,(i+1)*num_samples,labels=labels)
     
-    # open file as dataframe
-    df = pd.read_csv(gestures[gst])
+    # define output
     # ouput vector for gesture, ex.: [0,1]
-    out = one_hot_gestures[ind]
-    # number of recordings in file
-    num_recordings = int(df.shape[0] /num_samples)
+    out = one_hot_gestures[i%2]
+
     
-    for i in range(num_recordings):
-        # take single recording and process it to vector for input using  
-        # Sample_arduino() object from signal_processing.py
-        smpl = Sample_arduino(df,i*num_samples,(i+1)*num_samples,labels=labels)
-        
-        # get a 1D vector of data for recording
-        tnsr = smpl.get_data_vector()
-        
-        # collect inputs and outputs
-        inputs.append(tnsr.squeeze().tolist())
-        outputs.append(out)
+    # get a 1D vector of data for recording
+    tnsr = smpl.get_data_vector()
+    
+    # collect inputs and outputs
+    inputs.append(tnsr.squeeze().tolist())
+    outputs.append(out)
     
     
 
